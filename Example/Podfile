@@ -3,8 +3,9 @@ use_frameworks!
 platform :ios, '10.0'
 
 target 'HCRecycleScrollView_Example' do
+  
   pod 'HCRecycleScrollView', :path => '../'
-
+  
   target 'HCRecycleScrollView_Tests' do
     inherit! :search_paths
 

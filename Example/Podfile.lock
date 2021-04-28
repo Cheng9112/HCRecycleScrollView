@@ -1,16 +1,23 @@
 PODS:
-  - HCRecycleScrollView (0.1.0)
+  - CHCUIKit (0.1.2)
+  - HCRecycleScrollView (0.1.0):
+    - CHCUIKit
 
 DEPENDENCIES:
   - HCRecycleScrollView (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - CHCUIKit
 
 EXTERNAL SOURCES:
   HCRecycleScrollView:
     :path: "../"
 
 SPEC CHECKSUMS:
-  HCRecycleScrollView: bb4b3c55e6e27eb4a44aa539fbf6ded1d891d3d7
+  CHCUIKit: f84105c4dcc9f42917cfc0a49f1374cab3304f6b
+  HCRecycleScrollView: f11bc2cbf71bdfa7c2d2809fc7dfd74f4d01e0ee
 
-PODFILE CHECKSUM: b74b49af82f9bc4fd53ab0a26a9b0cb3acc55cc6
+PODFILE CHECKSUM: 568ccd854499f079e197c5e1c631d3ef5bb5149f
 
 COCOAPODS: 1.10.1
