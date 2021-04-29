@@ -36,6 +36,28 @@ public enum HCCycleScrollViewPageContolStyle {
 
 public class HCRecycleScrollView: UIView {
 
+    //////////////////////  滚动控制API //////////////////////
+
+    /** 自动滚动间隔时间,默认2s */
+    public var autoScrollTimeInterval: CGFloat = 2.0
+    
+    /** 是否无限循环,默认true */
+    public var infiniteLoop: Bool = true
+
+    /** 是否自动滚动,默认Yes */
+    public var autoScroll: Bool = true
+
+    /** 图片滚动方向，默认为水平滚动 */
+    public var scrollDirection: UICollectionView.ScrollDirection = .horizontal
+
+    public weak var delegate: HCRecycleScrollViewDelegate?
+
+    /** block方式监听点击 */
+    public var clickItemOperationBlock: ((Int) -> ())?
+
+    /** block方式监听滚动 */
+    public var itemDidScrollOperationBlock: (() -> Void)?
+    
     /// 自定义样式属性
     /** 轮播图片的ContentMode，默认为 UIViewContentModeScaleToFill */
     public var bannerImageViewContentMode: ContentMode = .scaleToFill
@@ -53,7 +75,7 @@ public class HCRecycleScrollView: UIView {
     public var onlyDisplayText: Bool = false
 
     /** pagecontrol 样式，默认为动画样式 */
-    public var pageControlStyle: HCCycleScrollViewPageContolStyle = .HCCycleScrollViewPageContolStyleAnimated
+    public var pageControlStyle: HCCycleScrollViewPageContolStyle = .HCCycleScrollViewPageContolStyleClassic
 
     /** 分页控件位置 */
     public var pageControlAliment: HCCycleScrollViewPageContolAliment = .HCCycleScrollViewPageContolAlimentCenter
@@ -68,10 +90,10 @@ public class HCRecycleScrollView: UIView {
     public var pageControlDotSize: CGSize = CGSize(width: 10, height: 10)
 
     /** 当前分页控件小圆标颜色 */
-    public var currentPageDotColor: UIColor = .black
+    public var currentPageDotColor: UIColor = .white
 
     /** 其他分页控件小圆标颜色 */
-    public var pageDotColor: UIColor = .white
+    public var pageDotColor: UIColor = .lightGray
 
     /** 当前分页控件小圆标图片 */
     public var currentPageDotImage: UIImage?
@@ -80,19 +102,19 @@ public class HCRecycleScrollView: UIView {
     public var pageDotImage: UIImage?
 
     /** 轮播文字label字体颜色 */
-    public var titleLabelTextColor: UIColor = .gray
+    public var titleLabelTextColor: UIColor = .white
 
     /** 轮播文字label字体大小 */
     public var titleLabelTextFont: UIFont = UIFont.systemFont(ofSize: 14)
 
     /** 轮播文字label背景颜色 */
-    public var titleLabelBackgroundColor: UIColor = .white
+    public var titleLabelBackgroundColor: UIColor = UIColor.init(white: 0, alpha: 0.5)
 
     /** 轮播文字label高度 */
-    public var titleLabelHeight: CGFloat = 0
+    public var titleLabelHeight: CGFloat = 30
 
     /** 轮播文字label对齐方式 */
-    public var titleLabelTextAlignment: NSTextAlignment = .center
+    public var titleLabelTextAlignment: NSTextAlignment = .left
     
     /// 数据属性
     /// 网络图片数组
@@ -115,7 +137,8 @@ public class HCRecycleScrollView: UIView {
     public convenience init(frame: CGRect, delegate: HCRecycleScrollViewDelegate?, placeholderImage: UIImage) {
         
         self.init(frame: frame)
-        
+        self.placeholderImage = placeholderImage
+        self.delegate = delegate
     }
     
     /// 初始化本地图片轮播图
@@ -127,12 +150,14 @@ public class HCRecycleScrollView: UIView {
     public convenience init(frame: CGRect, delegate: HCRecycleScrollViewDelegate?, imageArray: [UIImage], _ infiniteLoop: Bool = false) {
         
         self.init(frame: frame)
-        
+        self.localizationImagesGroup = imageArray
+        self.delegate = delegate
+        self.infiniteLoop = infiniteLoop
     }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        backgroundColor = .lightGray
         addSubview(self.collectionView)
     }
     
@@ -172,24 +197,102 @@ public class HCRecycleScrollView: UIView {
     
 }
 // MARK: - Public
-extension HCRecycleScrollView {
+public extension HCRecycleScrollView {
     
+    /** 可以调用此方法手动控制滚动到哪一个index */
+    func makeScrollViewScrollToIndex(index: Int) {
+        
+    }
+
+    /** 解决viewWillAppear时出现时轮播图卡在一半的问题，在控制器viewWillAppear时调用此方法 */
+    func adjustWhenControllerViewWillAppera() {
+        
+    }
+
 }
 // MARK: - Private
-extension HCRecycleScrollView {
+private extension HCRecycleScrollView {
     
+    func pageControlIndexWithCurrentCellIndex(index: Int) -> Int {
+        return index % (imagePathsGroup?.count ?? 1)
+    }
     
+    /// 初始化定时器
+    func setupTimer() {
+        
+        invalidateTimer()
+        timer = Timer.scheduledTimer(timeInterval: autoScrollTimeInterval, target: self, selector: #selector(), userInfo: nil, repeats: true)
+        if let temp = timer {
+            RunLoop.main.add(temp, forMode: .common)
+        }
+    }
+    /// 释放定时器
+    func invalidateTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    /// 自动滚动
+    func automaticScroll() {
+    
+        guard totalItemCount > 0 else {
+            return
+        }
+        let currentIndex = currentIndex()
+        scrollToIndex(currentIndex + 1)
+    }
+    /// 滚动到对应的下标
+    func scrollToIndex(targetIndex: Int) {
+        
+    }
+    ///
+    func currentIndex() -> Int {
+        if (_mainView.sd_width == 0 || _mainView.sd_height == 0) {
+            return 0;
+        }
+        
+        int index = 0;
+        if (_flowLayout.scrollDirection == UICollectionViewScrollDirectionHorizontal) {
+            index = (_mainView.contentOffset.x + _flowLayout.itemSize.width * 0.5) / _flowLayout.itemSize.width;
+        } else {
+            index = (_mainView.contentOffset.y + _flowLayout.itemSize.height * 0.5) / _flowLayout.itemSize.height;
+        }
+        
+        return MAX(0, index);
+    }
 }
-// MARK: -
+// MARK: - UICollectionViewDelegate, UICollectionViewDataSource
 extension HCRecycleScrollView: UICollectionViewDelegate, UICollectionViewDataSource {
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        
+        return totalItemCount
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
     }
     
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        delegate?.cycleScrollView?(cycleScrollView: self, didSelectItemAtIndex: pageControlIndexWithCurrentCellIndex(index: indexPath.item))
+
+        if let clickItemOperationBlock = clickItemOperationBlock {
+            clickItemOperationBlock(pageControlIndexWithCurrentCellIndex(index: indexPath.item))
+        }
+    }
+}
+// MARK: - UIScrollViewDelegate
+extension HCRecycleScrollView: UIScrollViewDelegate {
     
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    
+        guard let array = imagePathsGroup, array.count > 0 else {
+            return
+        }
+    }
+    
+    public func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        if autoScroll {
+            
+        }
+    }
 }
