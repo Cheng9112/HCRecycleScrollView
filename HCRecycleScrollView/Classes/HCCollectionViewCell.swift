@@ -46,6 +46,14 @@ class HCCollectionViewCell: UICollectionViewCell {
             }
         }
     }
+    public var titleLabelTextFont: UIFont? {
+        didSet {
+            if let font = titleLabelTextFont {
+                titleLable.font = font
+            }
+        }
+    }
+    public var hasConfigured: Bool = false
     /// 文字高度
     public var titleLabelHeight: CGFloat = 0
     /// 只展示文字轮播
